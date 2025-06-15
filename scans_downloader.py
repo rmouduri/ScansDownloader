@@ -95,7 +95,7 @@ def get_chapters_in_threads(min_chapter: int, max_chapter: int) -> bool:
         log(f"Min chapter ({min_chapter}) lower than max chapter ({max_chapter})", color=RED)
         return False
 
-    bars = [ get_bar(chapter, abs(chapter-max_chapter)) for chapter in range(min_chapter, max_chapter+1) ]
+    bars = [ get_bar(chapter, position=chapter-min_chapter) for chapter in range(min_chapter, max_chapter+1) ]
     threads = []
     for chapter in range(min_chapter, min_chapter + MAX_THREADS):
         t = Thread(target=get_chapters_from_list,  args=[ [ (n, bars[n-min_chapter]) for n in range(chapter, max_chapter+1, MAX_THREADS) ] ])
@@ -104,6 +104,9 @@ def get_chapters_in_threads(min_chapter: int, max_chapter: int) -> bool:
 
     for t in threads:
         t.join()
+    
+    for bar in bars:
+        bar.close()
 
 
 def send_windows_notification(start_chapter: int, end_chapter: int):
